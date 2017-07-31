@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class UIUpdater : MonoBehaviour {
 
-    public enum Stat { Agility, Constitution, Dexterity };
+    public enum Stat {Strength, Agility, Constitution, Dexterity, Overload };
     [SerializeField] public Stat stat;
     [SerializeField] Text statName;
     [SerializeField] Text statDisplay;
@@ -16,7 +16,12 @@ public class UIUpdater : MonoBehaviour {
     GameObject[] players;
 
     // Use this for initialization
-    void Start () {        
+    void Start () {
+        if (stat == Stat.Strength)
+        {
+            statName.text = "Strength";
+            statDisplay.text = statValue.ToString();
+        }
         if (stat == Stat.Agility)
         {
             statName.text = "Agility";
@@ -30,6 +35,11 @@ public class UIUpdater : MonoBehaviour {
         if (stat == Stat.Dexterity)
         {
             statName.text = "Dexterity";
+            statDisplay.text = statValue.ToString();
+        }
+        if (stat == Stat.Overload)
+        {
+            statName.text = "Overload";
             statDisplay.text = statValue.ToString();
         }
     }

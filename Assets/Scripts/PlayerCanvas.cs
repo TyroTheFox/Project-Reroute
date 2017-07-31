@@ -13,6 +13,10 @@ public class PlayerCanvas : MonoBehaviour
     [SerializeField] Text healthValue;
     [SerializeField] Text killsValue;
     [SerializeField] Text logText;
+    [SerializeField] Text clip;
+    [SerializeField] Text totalAmmo;
+    [SerializeField] Text weaponName;
+    [SerializeField] Text shieldValue;
     [SerializeField] AudioSource deathAudio;
 
     //Ensure there is only one PlayerCanvas
@@ -29,10 +33,14 @@ public class PlayerCanvas : MonoBehaviour
     {
         reticule = GameObject.Find("Reticule").GetComponent<Image>();
         damageImage = GameObject.Find("DamagedFlash").GetComponent<UIFader>();
-        gameStatusText = GameObject.Find("GameStatusText").GetComponent<Text>();
-        healthValue = GameObject.Find("HealthValue").GetComponent<Text>();
-        killsValue = GameObject.Find("KillsValue").GetComponent<Text>();
-        logText = GameObject.Find("LogText").GetComponent<Text>();
+        gameStatusText = GameObject.Find("StatusText").GetComponent<Text>();
+        healthValue = GameObject.Find("Health").GetComponent<Text>();
+        shieldValue = GameObject.Find("Shield").GetComponent<Text>();
+        killsValue = GameObject.Find("Kills").GetComponent<Text>();
+        logText = GameObject.Find("Log").GetComponent<Text>();
+        clip = GameObject.Find("Clip").GetComponent<Text>();
+        totalAmmo = GameObject.Find("TotalAmmo").GetComponent<Text>();
+        weaponName = GameObject.Find("WeaponName").GetComponent<Text>();
         deathAudio = GameObject.Find("DeathAudio").GetComponent<AudioSource>();
     }
 
@@ -66,6 +74,26 @@ public class PlayerCanvas : MonoBehaviour
     public void SetHealth(int amount)
     {
         healthValue.text = amount.ToString();
+    }
+
+    public void SetClip(float amount)
+    {
+        clip.text = amount.ToString();
+    }
+
+    public void SetTotalAmmo(float amount)
+    {
+        totalAmmo.text = amount.ToString();
+    }
+
+    public void SetWeaponName(string name)
+    {
+        weaponName.text = name;
+    }
+
+    public void SetShield(float amount)
+    {
+        shieldValue.text = amount.ToString();
     }
 
     public void WriteGameStatusText(string text)

@@ -3,12 +3,13 @@ using UnityEngine.Networking;
 
 public class PlayerHealth : NetworkBehaviour
 {
-    [SerializeField] public int maxHealth = 5;
+    [SerializeField] public int maxHealth = 125;
+    [SerializeField] public int maxShield = 125;
 
     [SyncVar(hook = "OnHealthChanged")] int health;
+    [SyncVar(hook = "OnShieldChanged")] int shield;
 
     Player player;
-
 
     void Awake()
     {
@@ -19,16 +20,24 @@ public class PlayerHealth : NetworkBehaviour
     void OnEnable()
     {
         health = maxHealth;
+        shield = maxShield;
         if (isLocalPlayer)
+        {
             Debug.Log("Health: " + health);
+            Debug.Log("Shield: " + shield);
+        }
     }
 
     [ServerCallback]
     void Start()
     {
         health = maxHealth;
+        shield = maxShield;
         if (isLocalPlayer)
+        {
             Debug.Log("Health: " + health);
+            Debug.Log("Shield: " + shield);
+        }
     }
 
     [Server]
@@ -39,6 +48,13 @@ public class PlayerHealth : NetworkBehaviour
         if (health <= 0)
             return died;
 
+        if(shield > 0)
+        {
+            shield -= damage;
+            if (isLocalPlayer)
+                Debug.Log("Shield: " + shield);
+            return false;
+        }
         health -= damage;
         if (isLocalPlayer)
             Debug.Log("Health: " + health);
@@ -53,8 +69,17 @@ public class PlayerHealth : NetworkBehaviour
     public void SetHealth(int newHealth)
     {
         health = newHealth;
+        Debug.Log("Health Value 1: " + newHealth);
         if (isLocalPlayer)
             PlayerCanvas.canvas.SetHealth(health);
+    }
+
+    [Server]
+    public void SetShield(int newShield)
+    {
+        shield = newShield;
+        if (isLocalPlayer)
+            PlayerCanvas.canvas.SetShield(shield);
     }
 
     [ClientRpc]
@@ -70,9 +95,21 @@ public class PlayerHealth : NetworkBehaviour
     void OnHealthChanged(int value)
     {
         health = value;
+        Debug.Log("Health Value 2: " + value);
         if (isLocalPlayer)
+        {
             Debug.Log("Health: " + health);
+            PlayerCanvas.canvas.SetHealth(health);
+        }
+    }
+
+    void OnShieldChanged(int value)
+    {
+        shield = value;
         if (isLocalPlayer)
-            PlayerCanvas.canvas.SetHealth(value);
+        {
+            Debug.Log("Shield: " + shield);
+            PlayerCanvas.canvas.SetShield(shield);
+        }
     }
 }

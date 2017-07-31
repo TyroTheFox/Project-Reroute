@@ -14,9 +14,11 @@ public class Player : NetworkBehaviour
     [SyncVar(hook = "OnNameChanged")] public string playerName;
     [SyncVar(hook = "OnColorChanged")] public Color playerColor;
 
+    [SyncVar(hook = "OnStrengthChanged")] public float Strength = 5;
     [SyncVar(hook = "OnAgilityChanged")] public float Agility = 5;
     [SyncVar(hook = "OnConstitutionChanged")] public float Constitution = 5;
     [SyncVar(hook = "OnDexterityChanged")] public float Dexterity = 5;
+    [SyncVar(hook = "OnOverloadChanged")] public float Overload = 5;
 
     [SerializeField] ToggleEvent onToggleShared;
     [SerializeField] ToggleEvent onToggleLocal;
@@ -29,7 +31,7 @@ public class Player : NetworkBehaviour
 
     GameObject mainCamera;
     NetworkAnimator anim;
-    PlayerCanvas pCanvas;
+    public PlayerCanvas pCanvas;
 
     private bool showUMState = false;
     private bool showUMPrevState = false;
@@ -39,11 +41,18 @@ public class Player : NetworkBehaviour
         anim = GetComponent<NetworkAnimator>();
         mainCamera = Camera.main.gameObject;
         GetComponent<FirstPersonController>().UpdateRunSpeed(Agility);
-        GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
+        //GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
         GetComponent<PlayerShooting>().damage = (int)Dexterity;
+        PlayerCanvas.canvas.SetClip(GetComponent<PlayerShooting>().currentWeapon.getCurrentCharge());
+        PlayerCanvas.canvas.SetTotalAmmo(GetComponent<PlayerShooting>().currentWeapon.getMaxCharge());
+        PlayerCanvas.canvas.SetWeaponName(GetComponent<PlayerShooting>().currentWeapon.getName());
         foreach (UIUpdater option in upgradeOptions)
         {
-            if(option.stat == UIUpdater.Stat.Agility)
+            if (option.stat == UIUpdater.Stat.Strength)
+            {
+                option.UpdateStatValue(Strength);
+            }
+            if (option.stat == UIUpdater.Stat.Agility)
             {
                 option.UpdateStatValue(Agility);
             }
@@ -54,6 +63,10 @@ public class Player : NetworkBehaviour
             if (option.stat == UIUpdater.Stat.Dexterity)
             {
                 option.UpdateStatValue(Dexterity);
+            }
+            if (option.stat == UIUpdater.Stat.Overload)
+            {
+                option.UpdateStatValue(Overload);
             }
         }
         EnablePlayer();
@@ -83,6 +96,10 @@ public class Player : NetworkBehaviour
 
         showUMPrevState = showUMState;
         showUMState = Input.GetKey(KeyCode.E);
+
+        PlayerCanvas.canvas.SetClip(GetComponent<PlayerShooting>().currentWeapon.getCurrentCharge());
+        PlayerCanvas.canvas.SetTotalAmmo(GetComponent<PlayerShooting>().currentWeapon.getMaxCharge());
+        PlayerCanvas.canvas.SetWeaponName(GetComponent<PlayerShooting>().currentWeapon.getName());
 
         if (!showUMPrevState && showUMState)
         {
@@ -173,6 +190,11 @@ public class Player : NetworkBehaviour
         GetComponentInChildren<RendererToggler>().ChangeColor(playerColor);
     }
 
+    void OnStrengthChanged(float s)
+    {
+        Strength = s;
+    }
+
     void OnAgilityChanged(float a)
     {
         Agility = a;
@@ -186,6 +208,54 @@ public class Player : NetworkBehaviour
     void OnDexterityChanged(float d)
     {
         Dexterity = d;
+    }
+
+    void OnOverloadChanged(float o)
+    {
+        Overload = o;
+    }
+
+    public void SetStrength(float s)
+    {
+        if (isLocalPlayer)
+        {
+            Strength = s;
+            pp.SetTotal((int)s);
+        }
+    }
+
+    public void IncreaseStrength(float s)
+    {
+        if (isLocalPlayer && s <= pp.currentTotal && pp.currentTotal > 0)
+        {
+            Strength += s;
+            pp.DecreaseTotal((int)s);
+            Debug.Log("Strength +" + s);
+            foreach (UIUpdater option in upgradeOptions)
+            {
+                if (option.stat == UIUpdater.Stat.Strength)
+                {
+                    option.UpdateStatValue(Strength);
+                }
+            }
+        }
+    }
+
+    public void DecreaseStrength(float s)
+    {
+        if (isLocalPlayer && Strength > 0)
+        {
+            Strength -= s;
+            pp.IncreaseTotal((int)s);
+            Debug.Log("Strength -" + s);
+            foreach (UIUpdater option in upgradeOptions)
+            {
+                if (option.stat == UIUpdater.Stat.Strength)
+                {
+                    option.UpdateStatValue(Strength);
+                }
+            }
+        }
     }
 
     public void SetAgility(float a)
@@ -241,8 +311,8 @@ public class Player : NetworkBehaviour
             Constitution = c;
             pp.SetTotal((int)c);
             Debug.Log("Constitution " + c);
-            GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
-            GetComponent<PlayerHealth>().SetHealth((int)Constitution);
+            GetComponent<PlayerHealth>().maxHealth = (int)Constitution * 25;
+            GetComponent<PlayerHealth>().SetHealth((int)Constitution * 25);
             foreach (UIUpdater option in upgradeOptions)
             {
                 if (option.stat == UIUpdater.Stat.Constitution)
@@ -260,8 +330,8 @@ public class Player : NetworkBehaviour
             Constitution += c;
             pp.DecreaseTotal((int)c);
             Debug.Log("Constitution +" + c);
-            GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
-            GetComponent<PlayerHealth>().SetHealth((int)Constitution);
+            GetComponent<PlayerHealth>().maxHealth = (int)Constitution * 25;
+            GetComponent<PlayerHealth>().SetHealth((int)Constitution * 25);
             foreach (UIUpdater option in upgradeOptions)
             {
                 if (option.stat == UIUpdater.Stat.Constitution)
@@ -279,8 +349,8 @@ public class Player : NetworkBehaviour
             Constitution -= c;
             pp.IncreaseTotal((int)c);
             Debug.Log("Constitution -" + c);
-            GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
-            GetComponent<PlayerHealth>().SetHealth((int)Constitution);
+            GetComponent<PlayerHealth>().maxHealth = (int)Constitution * 25;
+            GetComponent<PlayerHealth>().SetHealth((int)Constitution * 25);
             foreach (UIUpdater option in upgradeOptions)
             {
                 if (option.stat == UIUpdater.Stat.Constitution)
@@ -340,6 +410,49 @@ public class Player : NetworkBehaviour
                 if (option.stat == UIUpdater.Stat.Dexterity)
                 {
                     option.UpdateStatValue(Dexterity);
+                }
+            }
+        }
+    }
+
+    public void SetOverload(float o)
+    {
+        if (isLocalPlayer)
+        {
+            Overload = o;
+            pp.SetTotal((int)o);
+        }
+    }
+
+    public void IncreaseOverload(float o)
+    {
+        if (isLocalPlayer && o <= pp.currentTotal && pp.currentTotal > 0)
+        {
+            Overload += o;
+            pp.DecreaseTotal((int)o);
+            Debug.Log("Overload +" + o);
+            foreach (UIUpdater option in upgradeOptions)
+            {
+                if (option.stat == UIUpdater.Stat.Overload)
+                {
+                    option.UpdateStatValue(Overload);
+                }
+            }
+        }
+    }
+
+    public void DecreaseOverload(float o)
+    {
+        if (isLocalPlayer && Overload > 0)
+        {
+            Overload -= o;
+            pp.IncreaseTotal((int)o);
+            Debug.Log("Overload -" + o);
+            foreach (UIUpdater option in upgradeOptions)
+            {
+                if (option.stat == UIUpdater.Stat.Overload)
+                {
+                    option.UpdateStatValue(Overload);
                 }
             }
         }

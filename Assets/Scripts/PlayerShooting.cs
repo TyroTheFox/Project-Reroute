@@ -3,7 +3,6 @@ using UnityEngine.Networking;
 
 public class PlayerShooting : NetworkBehaviour
 {
-    //[SerializeField] float shotCooldown = .3f;
     [SerializeField] int killsToWin = 5;
     [SerializeField] Transform firePosition;
     [SerializeField] ShotEffectsManager shotEffects;
@@ -11,11 +10,12 @@ public class PlayerShooting : NetworkBehaviour
     public bool disableShoot = false;
 
     Weapon[] playerWeapons = {
-        new Weapon("Gun1", 1, 5, 1, 0.5f, 1, 10, 50),
-        new Weapon("Gun2", 2, 10, 10, 3, 10, 10, 10),
-        new Weapon("Gun3", 1, 15, 15, 0.9f, 5, 10, 10)
+        new Weapon("Revolver", 90, 2, 1, 1, 10, 60, 35, Weapon.ShootMode.NON),
+        new Weapon("SMG", 23, 3, 1, 0.2f, 2, 80, 25, Weapon.ShootMode.AUTO),
+        new Weapon("Carbine", 50, 2.5f, 1, 0.33f, 5, 45, 10, Weapon.ShootMode.NON),
+        new Weapon("Pump-Action Shotgun", 10, 10, 15, 1.5f, 5, 20, 180, Weapon.ShootMode.NON)
     };
-    Weapon currentWeapon = new Weapon("Error", 0, 0, 0, 0, 0, 0, 0);
+    public Weapon currentWeapon = new Weapon("Error", 0, 0, 0, 0, 0, 0, 0, Weapon.ShootMode.NON);
     int weaponPos = 0;
 
     [SyncVar(hook = "OnScoreChanged")] int score;
@@ -51,11 +51,28 @@ public class PlayerShooting : NetworkBehaviour
         ellapsedTime += Time.deltaTime;
         player = GetComponent<Player>();
 
-        if (Input.GetButtonDown("Fire1") && ellapsedTime > currentWeapon.getFireRate() && !disableShoot)
+        if(currentWeapon.getShootMode() == Weapon.ShootMode.NON)
         {
-            ellapsedTime = 0f;
-            CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
-                currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+            if (Input.GetButtonDown("Fire1") && ellapsedTime > currentWeapon.getFireRate() && !disableShoot
+                && currentWeapon.getCurrentCharge() > 0)
+            {
+                ellapsedTime = 0f;
+                currentWeapon.MakeShot();
+                CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
+                    currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+            }
+        }
+
+        if (currentWeapon.getShootMode() == Weapon.ShootMode.AUTO)
+        {
+            if (Input.GetButton("Fire1") && ellapsedTime > currentWeapon.getFireRate() && !disableShoot
+                && currentWeapon.getCurrentCharge() > 0)
+            {
+                ellapsedTime = 0f;
+                currentWeapon.MakeShot();
+                CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
+                    currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+            }
         }
 
         if (Input.GetButtonDown("ChangeWeapon"))
@@ -67,6 +84,12 @@ public class PlayerShooting : NetworkBehaviour
             }
             currentWeapon = playerWeapons[weaponPos];
             Debug.Log("Current Weapon: " + currentWeapon.getName());
+        }
+
+        if (Input.GetButton("Reload") && ellapsedTime > 1f)
+        {
+            ellapsedTime = 0f;
+            currentWeapon.Recharge(10);
         }
     }
 
@@ -82,7 +105,8 @@ public class PlayerShooting : NetworkBehaviour
             //Vector3 newDirection = Random.insideUnitCircle * spread;
             //newDirection.z = dex * range; // circle is at Z units 
             //newDirection = transform.TransformDirection(newDirection.normalized);
-            direction = MathCone.RandomInCone(direction, (Mathf.Deg2Rad * (10 - dex)));
+            //direction = MathCone.RandomInCone(direction, (Mathf.Deg2Rad * (10 - dex)), spread, dex * range);
+            direction = MathCone.RandomCone(direction, range, spread - dex);
             Ray ray = new Ray(origin, direction);
             if (isLocalPlayer)
                 Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f);
@@ -134,11 +158,25 @@ public class PlayerShooting : NetworkBehaviour
 
 public static class MathCone
 {
-    public static Vector3 RandomInCone(this Vector3 dir, float openingAngle)
+    public static Vector3 RandomInCone(this Vector3 dir, float openingAngle, float spread, float range)
     {
-        Vector3 deviation = Random.insideUnitSphere;
+        Vector3 deviation = Random.insideUnitCircle * spread;
+        deviation.z = range;
         dir = dir.normalized;
         deviation -= Vector3.Dot(deviation, dir) * dir;
         return (dir * Mathf.Cos(openingAngle) + deviation * Mathf.Sin(openingAngle)).normalized;
+    }
+
+    public static Vector3 RandomCone(Vector3 aim, float distance, float variance)
+    {
+        aim.Normalize();
+        Vector3 v3;
+        do
+        {
+            v3 = Random.insideUnitSphere;
+        } while (v3 == aim || v3 == -aim);
+        v3 = Vector3.Cross(aim, v3);
+        v3 = v3 * Random.Range(0.0f, variance);
+        return aim * distance + v3;
     }
 }
