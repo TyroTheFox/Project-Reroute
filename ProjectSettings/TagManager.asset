@@ -13,6 +13,7 @@ TagManager:
   - Fire
   - Alarm
   - AlarmLight
+  - GunCamera
   layers:
   - Default
   - TransparentFX

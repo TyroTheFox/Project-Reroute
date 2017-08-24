@@ -1,21 +1,23 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Networking;
 
 public class PlayerShooting : NetworkBehaviour
 {
     [SerializeField] int killsToWin = 5;
     [SerializeField] Transform firePosition;
-    [SerializeField] ShotEffectsManager shotEffects;
+    ShotEffectsManager shotEffects;
     [SerializeField] public int damage = 5;
+    [SerializeField] GameObject GunCamera;
+    [SerializeField] GunPositionSync GPS;
     public bool disableShoot = false;
-
-    Weapon[] playerWeapons = {
-        new Weapon("Revolver", 90, 2, 1, 1, 10, 60, 35, Weapon.ShootMode.NON),
+    [SerializeField] GameObject[] gameWeapons = { };
+    [SerializeField] GameObject[] playerWeapons = {};
+   /* new Weapon("Revolver", 90, 2, 1, 1, 10, 60, 35, Weapon.ShootMode.NON),
         new Weapon("SMG", 23, 3, 1, 0.2f, 2, 80, 25, Weapon.ShootMode.AUTO),
         new Weapon("Carbine", 50, 2.5f, 1, 0.33f, 5, 45, 10, Weapon.ShootMode.NON),
-        new Weapon("Pump-Action Shotgun", 10, 10, 15, 1.5f, 5, 20, 180, Weapon.ShootMode.NON)
-    };
-    public Weapon currentWeapon = new Weapon("Error", 0, 0, 0, 0, 0, 0, 0, Weapon.ShootMode.NON);
+        new Weapon("Pump-Action Shotgun", 10, 10, 15, 1.5f, 5, 20, 180, Weapon.ShootMode.NON)*/
+    public GameObject currentWeapon = null;
     int weaponPos = 0;
 
     [SyncVar(hook = "OnScoreChanged")] int score;
@@ -24,17 +26,43 @@ public class PlayerShooting : NetworkBehaviour
     float ellapsedTime;
     bool canShoot;
 
+    bool swinging = false;
+
     void Start()
     {
         player = GetComponent<Player>();
-        shotEffects.Initialize();
+        playerWeapons = gameWeapons;
         currentWeapon = playerWeapons[0];
-        Debug.Log("Current Weapon: " + currentWeapon.getName());
+        LoadCurrentWeapon();
 
         if (isLocalPlayer)
-        {
             canShoot = true;
+    }
+
+    public void LoadCurrentWeapon()
+    {
+        if (GunCamera.GetComponentsInChildren<Transform>().Length > 0)
+        {
+            var children = new List<GameObject>();
+            foreach (Transform child in GunCamera.transform) children.Add(child.gameObject);
+            children.ForEach(child => child.GetComponent<Weapon>().setModel(false));
         }
+        
+        GPS.leftHandHold = currentWeapon.GetComponent<Weapon>().getLeftHandHold();
+        GPS.rightHandHold = currentWeapon.GetComponent<Weapon>().getRightHandHold();
+        shotEffects = currentWeapon.GetComponent<Weapon>().getShotEffects();
+        if (shotEffects != null) shotEffects.Initialize();
+        if(currentWeapon.GetComponent<Weapon>().getAttackBox() != null)
+        {
+            currentWeapon.GetComponent<Weapon>().getAttackBox().holder = gameObject;
+        }
+
+        currentWeapon.GetComponent<Weapon>().setModel(true);
+        ellapsedTime = 0f;
+
+        if (isLocalPlayer)
+            Debug.Log("WEAPON LOADED: " + currentWeapon.name);
+        
     }
 
     [ServerCallback]
@@ -43,35 +71,69 @@ public class PlayerShooting : NetworkBehaviour
         score = 0;
     }
 
+    public int IncreaseScore()
+    {
+        score++;
+        return score;
+    }
+
+    public int getKillsToWin()
+    {
+        return killsToWin;
+    }
+
     void Update()
     {
         if (!canShoot)
             return;
-
+        
         ellapsedTime += Time.deltaTime;
         player = GetComponent<Player>();
 
-        if(currentWeapon.getShootMode() == Weapon.ShootMode.NON)
+        Weapon cw = currentWeapon.GetComponent<Weapon>();
+        Debug.Log(cw.getName());
+        if (cw.getShootMode() == Weapon.ShootMode.NON)
         {
-            if (Input.GetButtonDown("Fire1") && ellapsedTime > currentWeapon.getFireRate() && !disableShoot
-                && currentWeapon.getCurrentCharge() > 0)
+            if (Input.GetButtonDown("Fire1") && ellapsedTime > cw.getFireRate() && !disableShoot
+                && cw.getCurrentCharge() > 0)
             {
+                Debug.Log("RECHARGE!");
                 ellapsedTime = 0f;
-                currentWeapon.MakeShot();
-                CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
-                    currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+                cw.MakeShot();
+                cw.getAnimator().SetTrigger("Fire");
+                CmdFireShot(firePosition.position, firePosition.forward, cw.getDamage(),
+                    cw.getShots(), cw.getRange(), cw.getSpread(), player.Dexterity);
             }
         }
 
-        if (currentWeapon.getShootMode() == Weapon.ShootMode.AUTO)
+        if (cw.getShootMode() == Weapon.ShootMode.AUTO)
         {
-            if (Input.GetButton("Fire1") && ellapsedTime > currentWeapon.getFireRate() && !disableShoot
-                && currentWeapon.getCurrentCharge() > 0)
+            if (Input.GetButton("Fire1") && ellapsedTime > cw.getFireRate() && !disableShoot
+                && cw.getCurrentCharge() > 0)
             {
                 ellapsedTime = 0f;
-                currentWeapon.MakeShot();
-                CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
-                    currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+                cw.MakeShot();
+                cw.getAnimator().SetTrigger("Fire");
+                CmdFireShot(firePosition.position, firePosition.forward, cw.getDamage(),
+                    cw.getShots(), cw.getRange(), cw.getSpread(), player.Dexterity);
+            }
+        }
+
+        if (cw.getShootMode() == Weapon.ShootMode.MELEE)
+        {
+            if (Input.GetButton("Fire1") && ellapsedTime > 0.7f && !disableShoot)
+            {
+                ellapsedTime = 0f;
+                cw.getMeleeBox().enabled = true;
+                swinging = true;
+                cw.getAnimator().SetTrigger("Swing");
+            }
+
+            if (ellapsedTime > 2f && swinging)
+            {
+                ellapsedTime = 0f;
+                cw.getMeleeBox().enabled = true;
+                swinging = false;
             }
         }
 
@@ -83,13 +145,16 @@ public class PlayerShooting : NetworkBehaviour
                 weaponPos = 0;
             }
             currentWeapon = playerWeapons[weaponPos];
-            Debug.Log("Current Weapon: " + currentWeapon.getName());
+            Debug.Log(playerWeapons[weaponPos]);
+            LoadCurrentWeapon();
+            Debug.Log("Current Weapon: " + cw.getName());
         }
 
         if (Input.GetButton("Reload") && ellapsedTime > 1f)
         {
             ellapsedTime = 0f;
-            currentWeapon.Recharge(10);
+            cw.Recharge(10);
+            Debug.Log("RECHARGE!");
         }
     }
 
@@ -135,6 +200,7 @@ public class PlayerShooting : NetworkBehaviour
     [ClientRpc]
     void RpcProcessShotEffects(bool playImpact, Vector3 point)
     {
+        if(shotEffects != null)
         shotEffects.PlayShotEffects();
 
         if (playImpact)
@@ -150,8 +216,10 @@ public class PlayerShooting : NetworkBehaviour
 
     public void FireAsBot()
     {
-        CmdFireShot(firePosition.position, firePosition.forward, currentWeapon.getDamage(),
-                currentWeapon.getShots(), currentWeapon.getRange(), currentWeapon.getSpread(), player.Dexterity);
+        Weapon cw = currentWeapon.GetComponent<Weapon>();
+
+        CmdFireShot(firePosition.position, firePosition.forward, cw.getDamage(),
+                cw.getShots(), cw.getRange(), cw.getSpread(), player.Dexterity);
     }
 
 }

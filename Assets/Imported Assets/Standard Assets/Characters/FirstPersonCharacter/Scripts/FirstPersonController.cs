@@ -61,7 +61,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_RunSpeed = rs*2;
             m_WalkSpeed = rs;
-            Debug.Log(m_WalkSpeed + " / " + m_RunSpeed);
         }
 
         public void IncreaseRunSpeed(float rs)

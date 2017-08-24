@@ -43,9 +43,13 @@ public class Player : NetworkBehaviour
         GetComponent<FirstPersonController>().UpdateRunSpeed(Agility);
         //GetComponent<PlayerHealth>().maxHealth = (int)Constitution;
         GetComponent<PlayerShooting>().damage = (int)Dexterity;
-        PlayerCanvas.canvas.SetClip(GetComponent<PlayerShooting>().currentWeapon.getCurrentCharge());
-        PlayerCanvas.canvas.SetTotalAmmo(GetComponent<PlayerShooting>().currentWeapon.getMaxCharge());
-        PlayerCanvas.canvas.SetWeaponName(GetComponent<PlayerShooting>().currentWeapon.getName());
+        GameObject cw = GetComponent<PlayerShooting>().currentWeapon;
+        if (cw != null)
+        {
+            PlayerCanvas.canvas.SetClip(cw.GetComponent<Weapon>().getCurrentCharge());
+            PlayerCanvas.canvas.SetTotalAmmo(cw.GetComponent<Weapon>().getMaxCharge());
+            PlayerCanvas.canvas.SetWeaponName(cw.GetComponent<Weapon>().getName());
+        }
         foreach (UIUpdater option in upgradeOptions)
         {
             if (option.stat == UIUpdater.Stat.Strength)
@@ -97,9 +101,13 @@ public class Player : NetworkBehaviour
         showUMPrevState = showUMState;
         showUMState = Input.GetKey(KeyCode.E);
 
-        PlayerCanvas.canvas.SetClip(GetComponent<PlayerShooting>().currentWeapon.getCurrentCharge());
-        PlayerCanvas.canvas.SetTotalAmmo(GetComponent<PlayerShooting>().currentWeapon.getMaxCharge());
-        PlayerCanvas.canvas.SetWeaponName(GetComponent<PlayerShooting>().currentWeapon.getName());
+        GameObject cw = GetComponent<PlayerShooting>().currentWeapon;
+        if (cw != null)
+        {
+            PlayerCanvas.canvas.SetClip(cw.GetComponent<Weapon>().getCurrentCharge());
+            PlayerCanvas.canvas.SetTotalAmmo(cw.GetComponent<Weapon>().getMaxCharge());
+            PlayerCanvas.canvas.SetWeaponName(cw.GetComponent<Weapon>().getName());
+        }
 
         if (!showUMPrevState && showUMState)
         {
@@ -109,8 +117,8 @@ public class Player : NetworkBehaviour
             c = GameObject.FindGameObjectWithTag("Upgrade Screen");
             c.GetComponent<Canvas>().enabled = !c.GetComponent<Canvas>().enabled;
             GetComponent<PlayerShooting>().disableShoot = !GetComponent<PlayerShooting>().disableShoot;
-            Debug.Log("Lock " + GetComponent<FirstPersonController>().m_MouseLook.lockCursor);
-            Debug.Log("E");
+            //Debug.Log("Lock " + GetComponent<FirstPersonController>().m_MouseLook.lockCursor);
+           // Debug.Log("E");
         }
     }
 

@@ -3,8 +3,8 @@ using UnityEngine.Networking;
 
 public class PlayerHealth : NetworkBehaviour
 {
-    [SerializeField] public int maxHealth = 125;
-    [SerializeField] public int maxShield = 125;
+    [SerializeField] public int maxHealth = 150;
+    [SerializeField] public int maxShield = 150;
 
     [SyncVar(hook = "OnHealthChanged")] int health;
     [SyncVar(hook = "OnShieldChanged")] int shield;
@@ -95,21 +95,10 @@ public class PlayerHealth : NetworkBehaviour
     void OnHealthChanged(int value)
     {
         health = value;
-        Debug.Log("Health Value 2: " + value);
-        if (isLocalPlayer)
-        {
-            Debug.Log("Health: " + health);
-            PlayerCanvas.canvas.SetHealth(health);
-        }
     }
 
     void OnShieldChanged(int value)
     {
         shield = value;
-        if (isLocalPlayer)
-        {
-            Debug.Log("Shield: " + shield);
-            PlayerCanvas.canvas.SetShield(shield);
-        }
     }
 }

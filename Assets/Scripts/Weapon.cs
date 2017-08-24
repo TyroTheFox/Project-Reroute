@@ -1,18 +1,30 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-public class Weapon{
+public class Weapon : MonoBehaviour{
 
-    string name = "Gun";
-    int damage = 0;
-    float spread = 0;
-    int shots = 0;
-    float fireRate = 0;
-    float chargePerShot = 0;
+    [SerializeField] string name = "Gun";
+    [SerializeField] int damage = 0;
+    [SerializeField] float spread = 0;
+    [SerializeField] int shots = 0;
+    [SerializeField] float fireRate = 0;
+    [SerializeField] float chargePerShot = 0;
     float currentCharge = 0;
-    float maxCharge = 0;
-    float range = 0;
-    public enum ShootMode {NON, AUTO};
-    ShootMode sm = ShootMode.NON;
+    [SerializeField] float maxCharge = 0;
+    [SerializeField] float range = 0;
+    public enum ShootMode {NON, AUTO, MELEE};
+    [SerializeField] ShootMode sm = ShootMode.NON;
+    [SerializeField] BoxCollider meleeBox;
+    [SerializeField] AttackBox attackBox;
+    [SerializeField] MeshRenderer model;
+    [SerializeField] Transform rightHandHold;
+    [SerializeField] Transform leftHandHold;
+    [SerializeField] ShotEffectsManager shotEffects;
+    [SerializeField] Animator animator;
+
+    public void Start()
+    {
+        currentCharge = this.maxCharge;
+    }
 
     // Use this for initialization
     public Weapon (string name, int damage, float spread, int shots, float fireRate, 
@@ -41,5 +53,11 @@ public class Weapon{
     public void MakeShot() { currentCharge -= chargePerShot; if (currentCharge < 0) { currentCharge = 0; } }
     public void Recharge(float i) { currentCharge += i; if (currentCharge > maxCharge) { currentCharge = maxCharge; } }
     public ShootMode getShootMode() { return sm; }
-
+    public BoxCollider getMeleeBox() { return meleeBox; }
+    public AttackBox getAttackBox() { return attackBox; }
+    public Transform getLeftHandHold() { return leftHandHold; }
+    public Transform getRightHandHold() { return rightHandHold; }
+    public ShotEffectsManager getShotEffects() { return shotEffects; }
+    public void setModel(bool b) { model.enabled = b; ; }
+    public Animator getAnimator() { return animator; }
 }
