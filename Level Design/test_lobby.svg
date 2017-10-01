@@ -306,18 +306,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="291.92618"
-     inkscape:cy="267.56937"
+     inkscape:zoom="1.3512419"
+     inkscape:cx="443.16118"
+     inkscape:cy="97.152748"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      units="px"
      inkscape:object-nodes="true"
      inkscape:snap-smooth-nodes="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="705"
-     inkscape:window-x="-8"
+     inkscape:window-width="1280"
+     inkscape:window-height="961"
+     inkscape:window-x="1358"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:snap-text-baseline="true">
@@ -336,7 +336,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -411,10 +411,10 @@
        sodipodi:nodetypes="sssccccccccccccccccccccccccccscccccccsscs" />
     <path
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#5fbcd3;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.19999981;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       d="m 104,1042.3622 c 0,-8.8366 7.16344,-16 16,-16 l 16,0 c 0,22.0914 17.90861,40 40,40 0,-22.0914 17.90861,-40 40,-40 l 0,-32.00002 c 0,-35.34622 28.65378,-64 64,-64 35.34622,0 64,28.65378 64,64.00001 l -24,10e-6 0,136 72,0 0,-48 8,0 0,48 24,0 0,44 c 0,8.8366 -7.16344,16 -16,16 l -24,0 0,-4 c 0,-13.2548 -10.74517,-24 -24,-24 l -48,0 0,24 24,0 0,56 24,0 c 13.25483,0 24,-10.7452 24,-24 l 0,-4 24,0 c 22.09139,0 40,-17.9086 40,-40 l 0,-140 -48,0 0,16 -8,0 0,-48 8,0 0,16 48,0 0,-96 -8,0 0,-8.00001 c 0,-8.83657 -7.16344,-16.00001 -16,-16.00001 -8.83656,0 -16,7.16344 -16,16 l 0,8.00002 -8,0 0,48 -8,0 0,-80 -176,0 0,24 c 0,17.67311 -14.32689,32 -32,32 l -24,0 0,48 -40,-10e-6 c -26.50967,-1e-5 -48.000002,21.49031 -48.000002,48.00001 l 0,24 c 0,5.7162 3.049579,10.9983 8,13.8564 4.95042,2.8581 11.049579,2.8581 16.000002,0 4.95042,-2.8581 8,-8.1402 8,-13.8564 z"
+       d="m 384,1218.3622 c 0,13.2548 -10.74517,24 -24,24 l -24,0 0,-56 -24,0 0,-24 48,0 c 13.25483,0 24,10.7452 24,24 l 8,0 c 8.83656,0 16,-7.1634 16,-16 l 0,-40 -8,0 0,-48 -8,0 0,48 -72,0 0,-136 24,-10e-6 c 0,-35.34623 -28.65378,-64.00001 -64,-64.00001 -35.34622,0 -64,28.65378 -64,64 l 0,32.00002 c -22.09139,0 -40,17.9086 -40,40 -22.09139,0 -40,-17.9086 -40,-40 l -16,0 c -8.83656,0 -16,7.1634 -16,16 l 0,24 c 0,5.7162 -3.04958,10.9983 -8,13.8564 -4.950423,2.8581 -11.049582,2.8581 -16.000002,0 -4.950421,-2.8581 -8,-8.1402 -8,-13.8564 l 0,-24 c 0,-26.5097 21.490332,-48.00002 48.000002,-48.00001 l 40,10e-6 0,-48 24,0 c 17.67311,0 32,-14.32689 32,-32 l 0,-24 176,0 0,80 8,0 0,-48 8,0 0,-8.00002 c 0,-8.83656 7.16344,-16 16,-16 8.83656,0 16,7.16344 16,16.00001 l 0,8.00001 8,0 0,96 -48,0 0,-16 -8,0 0,48 8,0 0,-16 48,0 0,96 -8,0 0,40 c 0,26.5097 -21.49033,48 -48,48 z"
        id="path4460"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccscccccccccccssccccccccccsscccscccccccccccccccsccsscc" />
+       sodipodi:nodetypes="cccccssccccccccccsccccccccssccscccccccccccccccscccssccccccc" />
     <path
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#257488;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.19999981;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
        d="m 240,1130.3622 0,-40 80,0 0,40 z"
